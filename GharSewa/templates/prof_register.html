@@ -1,0 +1,223 @@
+{% extends 'base.html' %} {% block title %}Professional Register {% endblock title %}
+ {% block body %}
+<section class="gradient-custom">
+  <div class="container py-3 h-100">
+    <div class="row justify-content-center align-items-center h-100">
+      <div class="col-12 col-lg-9 col-xl-7">
+        <div
+          class="card shadow-2-strong card-registration"
+          style="border-radius: 15px"
+        >
+          <div class="card-body p-2 p-md-3 bg-light">
+            <h3 class="mb-4 pb-2 pb-md-0 mb-md-5 text-center">
+              Welcome Professional, Create an Account.
+            </h3>
+            <form
+              action="/prof_register/"
+              method="POST"
+              enctype="multipart/form-data"
+            >
+              {% csrf_token %}
+
+              <div class="row mb-4">
+                <div class="form-outline">
+                  <label class="form-label" for="UserName">Username</label>
+                  <input
+                    type="text"
+                    id="user_username"
+                    name="user_username"
+                    class="form-control"
+                    placeholder="Choose a unique username"
+                  />
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label" for="firstName"
+                        >First Name</label
+                      >
+                      <input
+                        type="text"
+                        id="user_fname"
+                        name="user_fname"
+                        class="form-control"
+                        placeholder="Enter Your First Name"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label" for="lastName">Last Name</label>
+                      <input
+                        type="text"
+                        id="user_lname"
+                        name="user_lname"
+                        class="form-control"
+                        placeholder="Enter Your Last Name"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label" for="user_email"
+                        >Email Address</label
+                      >
+                      <input
+                        type="email"
+                        id="user_email"
+                        name="user_email"
+                        class="form-control"
+                        placeholder="name@example.com"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label" for="user_phone"
+                        >Phone Number</label
+                      >
+                      <input
+                        type="tel"
+                        id="user_phone"
+                        name="user_phone"
+                        class="form-control"
+                        placeholder="Enter Your Phone Number"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label" for="user_address"
+                        >Full Address</label
+                      >
+                      <input
+                        type="text"
+                        id="user_address"
+                        name="user_address"
+                        class="form-control"
+                        placeholder="Enter Your Full Address"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label" for="image"
+                        >Upload Profile Image</label
+                      >
+                      <input type="file" id="image" name="image" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label" for="user_pass1"
+                        >Choose a Password</label
+                      >
+                      <input
+                        type="password"
+                        id="user_pass1"
+                        name="user_pass1"
+                        class="form-control"
+                        placeholder="Choose Your Password"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label" for="user_pass2"
+                        >Confirm Password</label
+                      >
+                      <input
+                        type="password"
+                        id="user_pass2"
+                        name="user_pass2"
+                        class="form-control"
+                        placeholder="Confirm Password"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label select-label">Select the Service</label>
+                      <select class="form-select" name="service" id="service">
+                        <option value="none">Select Service</option>
+                        {% for service in services %}
+
+                        <option value="{{service.service_id}}">{{service}}</option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div> 
+
+                  <div class="col-md-6 mb-4">
+                    <div class="form-outline">
+                      <label class="form-label select-label">Choose Your Working Location</label>
+                      <select class="form-select" name="city" id="city">
+                        <option value="none">Select Location</option>
+                        {% for i in city %}
+
+                        <option value="{{i.id}}">{{i}}</option>
+
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-4">
+                  <div class="form-outline">
+                    <label class="form-label" for="exp"
+                      >Experience: (In years)</label
+                    >
+                    <input
+                      type="number"
+                      name="exp"
+                      class="form-control"
+                      placeholder="In Numbers"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                  <div class="form-outline">
+                    <label class="form-label" for="cert"
+                      >Upload Training Certificate</label
+                    >
+                    <input type="file" id="cert" name="cert" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12 pt-1">
+                  <input class="btn btn-dark" type="submit" value="Submit" />
+                </div>
+              </div>
+            </form>
+
+            <div class="row mt-2">
+              <hr />
+              <div class="col-12">
+                <p class="text-center mb-0">Already Have An Account?</p>
+                <p class="text-center"><a href="/login">Login</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock body %}

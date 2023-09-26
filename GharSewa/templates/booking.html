@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% block title %} Booking {% endblock %}
+{% block body %}
+<div class="container mt-3">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-center">Service and Service Provider to be booked:: </h3>
+        </div>
+        <div class="card-body row">
+            <div class="col-md-4">
+                <h6 class="text-danger"><u> Service details</u></h6>
+                <h2 class="card-title">{{prof.service.service_name}}</h2>
+            </div>
+            <div class="col-md-1 m-3">
+                <h1> -> </h1>
+            </div>
+            <div class="col-md-6 p-0 m-0">
+                <h6 class="text-danger"><u> Service Provider details</u></h6>
+                <p class="m-0">Full Name: {{prof.user.first_name}} {{prof.user.last_name}}</p>
+                <p class="m-0">Contact: {{prof.phone}}</p>
+                <p class="m-0">Address: {{prof.fullAddress}}</p>
+                <p class="m-0">Experience: {{prof.experience}}</p>
+            </div>
+
+
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="col-md-8">
+
+
+    </div>
+
+    <hr>
+    <div>
+        <h4>Please Fill Up The Booking Details</h4>
+        <hr>
+
+        <form action="" method="POST">
+            {% csrf_token %}
+            <div class="form-group mt-2">
+                <label>Name</label>
+                <input type="text" class="form-control" name="name" placeholder="Enter Name" value="{{customer.user.first_name}} {{customer.user.last_name}}" required>
+            </div>
+            <div class="form-group my-2">
+                <label>Contact</label>
+                <input type="tel" class="form-control" name="phone" placeholder="Enter Phone" value="{{customer.phone}}" required>
+            </div>
+            <div class="form-group">
+                <label>Address</label>
+                <input type="text" class="form-control" name="address" placeholder="Enter address" required>
+            </div>
+            <div class="form-group mt-2">
+                <div class="row">
+                    <div class="col">
+                        <label>Date</label>
+                        <input type="date" class="form-control" name="date" placeholder="Enter Date" required>
+                    </div>
+                    <div class="col">
+                        <label>Day</label>
+                        <select class="form-control" name="day" required>
+                            <option>Select Days</option>
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label>Hour</label>
+                        <select class="form-control" name="hour" required>
+                            <option>Select Hours</option>
+                            <option>1-2</option>
+                            <option>2-4</option>
+                            <option>4-6</option>
+                            <option>6-8</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group my-2">
+                <button type="submit" class="btn btn-outline-primary" id="payment-button">Khalti Pay</button> 
+                {% comment %} <button style="padding: 5px; background-color: rgb(77, 32, 119); font-family: sans-serif; color: white;font-weight: 300;border-radius: 7px;" id="payment-button" onclick = "booked()">Khalti</button> {% endcomment %}
+
+                {% comment %} <a href="{% url 'payment' %}">Pay with khalti</button></a> {% endcomment %}
+                <button type="reset" class="btn btn-outline-danger">Reset</button>
+                
+
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+    var config = {
+        // replace the publicKey with yours
+        "publicKey": "test_public_key_7d87b1034b6f459fa16b6da3705e1e07",
+        "productIdentity": "1234567890",
+        "productName": "GharSewa",
+        "productUrl": "http://gameofthrones.wikia.com/wiki/Dragons",
+        "paymentPreference": [
+            "KHALTI",
+            "EBANKING",
+            "MOBILE_BANKING",
+            "CONNECT_IPS",
+            "SCT",
+            ],
+        "eventHandler": {
+            onSuccess (payload) {
+                // hit merchant api for initiating verfication
+                console.log(payload);
+            },
+            onError (error) {
+                console.log(error);
+            },
+            onClose () {
+                console.log('widget is closing');
+            }
+        }
+    };
+
+    var checkout = new KhaltiCheckout(config);
+    var btn = document.getElementById("payment-button");
+    btn.onclick = function () {
+        // minimum transaction amount must be 10, i.e 1000 in paisa.
+        console.log("Note that this is advance payment only")
+        checkout.show({amount: 25000});
+    }
+</script>
+{% comment %} <script>
+    function booked() {
+        alert('The service has been booked!!!')
+        window.location = ''
+    }
+</script> {% endcomment %}
+{% endblock %}
