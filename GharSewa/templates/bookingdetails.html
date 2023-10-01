@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block title %} Booking Details {% endblock %}
+{% block css %}
+<style>
+    .container {
+        min-height: 80vh;
+    }
+
+    .container h2 {
+        font-weight: bold;
+        font-family: 'Monotype Corsiva';
+        color: #f33431;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .hidden {
+        display: none;
+    }
+</style>
+{% endblock%}
+
+{% block body %}
+
+{% if page %}
+<div class="container">
+    <h2>Booking Details</h2>
+    <hr>
+    <table class="table table-hover">
+        <thead class="table-dark text-white">
+            <tr>
+                <th scope="col">S.No</th>
+                <th scope="col">Service Booked</th>
+                <th scope="col">Service Provider</th>
+                <th scope="col">Book Date</th>
+                <th scope="col">
+                    <center>Book Days</center>
+                </th>
+                <th scope="col">
+                    <center>Book Hours</center>
+                </th>
+
+                <th scope="col">
+                    <center>Action</center>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books%}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td>{{book.professional.service.service_name}}</td>
+                <td>{{book.professional.user.first_name}} {{book.professional.user.last_name}}
+                </td>
+    
+                <td>{{book.book_date}}</td>
+                <td>
+                    <center>{{book.book_days}} days</center>
+                </td>
+                <td>
+                    <center>{{book.book_hours}} hours</center>
+                </td>
+
+                <td>
+                    <a href="{% url "cancelBooking" book.id %}">
+                        <center><button class="btn-sm btn-danger"
+                                onclick="return confirm('Do You wanna cancel the Booking?')">
+                                Cancel
+                            </button></center>
+                    </a>
+                </td>
+
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+
+
+</div>
+
+
+{% else%}
+
+<div class="container">
+    <h2>Booking Details</h2>
+    <hr>
+    <table class=" table table-hover">
+        <thead class="table-dark text-white">
+            <tr>
+                <th scope="col">S.No</th>
+                <th scope="col">Service Booked</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Address</th>
+                <th scope="col">Book Date</th>
+                <th scope="col">Book Hours</th>
+                <th scope="col">Book Days</th>
+                <th scope="col">Action</th>
+            </tr>
+        <tbody>
+            </thead>
+            {% for book in books%}
+            <tr>
+                <th scope="row">{{forloop.counter}}</th>
+                <td>{{book.professional.service.service_name}}</td>
+                <td>{{book.customer.user.first_name}} {{book.customer.user.last_name}}
+                </td>
+                <td>{{book.customer.fullAddress}}</td>
+                <td>{{book.book_date}}</td>
+                <td>{{book.book_hours}} hours</td>
+                <td>{{book.book_days}} days</td>
+
+
+                
+                <td>
+                    <a href="{% url "cancelBooking" book.id %}"><button class="btn-sm btn-danger"
+                            onclick="return confirm('Do You wanna cancel the Booking?')">Cancel
+                                </button></a>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+
+</div>
+
+{% endif %}
+
+
+{% endblock %}
+

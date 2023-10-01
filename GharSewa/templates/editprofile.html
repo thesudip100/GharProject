@@ -32,7 +32,7 @@
 
     {% endblock css %}
 
-    <title>GharSewa|{% block title %}  {% endblock title %}</title>
+    <title>GharSewa|Edit</title>
 </head>
 
 <body>
@@ -68,60 +68,140 @@
 
                 </ul>
                 
-                <div class="m-2">
-
-                {% if user.is_authenticated %}
-                    <span class="dropdown">
-                        <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userid"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                     Welcome, {{request.user.username}}
-                </button>
                 
-                <ul class="dropdown-menu" aria-labelledby="userid">
-                    {% if user.is_superuser %}
-                        <a class="dropdown-item" href="/admin">Dashboard</a>
-                    {% else %}
-                        <a class="dropdown-item" href="/profile">Profile</a>
-                    {% endif%}
-                    <a class="dropdown-item" href="/logout">Logout</a>
-                    {% if not user.is_superuser%}
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <a class="dropdown-item" href="/bookingdetails">Booking Details</a>
-                    {% endif %}
-                </ul>
-            </span>
-            
-            
-                    
-            {% else %}
-                    <a href="/login" class="btn btn-primary mx-2" type="button" >Login</a>
-
-                    <span class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1"
-                            data-bs-toggle="dropdown" aria-expanded="false" style="background-color: rgb(12, 195, 12); border: none;">
-                            Sign up
-                        </button>
-
-                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" >
-                            <a class="dropdown-item" href="/prof_register">Professional</a>
-                            <a class="dropdown-item" href="/customer_register">Customer</a>
-                        </ul>
-                    </span>
-                    {% endif %}
-                </div>
-            </div>
-
         </div>
         </div>
     </nav>
 
     <!-- End of Nav Bar -->
 
+    <div class="container my-3">
+
+        <h3 class="mt-2 text-center text-danger">Welcome {{user.firstName}} {{user.lastName}}, Please Edit
+            Your Profile</h3>
+        <hr>
     
-    {% block body %}{% endblock body %}
+        <form action="" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control"  name="username" value="{{user.user.username}}"
+                    placeholder="Choose a unique username">
+            </div>
+            <div class="form-group my-2">
+                <div class="row">
+                    <div class="col">
+                        <label for="fname">First Name</label>
+                        <input type="text" class="form-control"  name="fname" value="{{user.firstName}}"
+                            placeholder="Enter Your First Name">
+                    </div>
+                    <div class="col">
+                        <label for="lname">Last Name</label>
+                        <input type="text" class="form-control"  name="lname" value="{{user.lastName}}"
+                            placeholder="Enter Your Last Name">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email address</label>
+                <input type="email" class="form-control"  name="email" value="{{user.email}}"
+                    placeholder="name@example.com">
     
+            </div>
+    
+            <div class="form-group my-2">
+                <div class="row">
+                    <div class="col">
+                        <label>Full Address</label>
+                        <input type="text" class="form-control"  name="address" value="{{user.fullAddress}}"
+                            placeholder="Enter Address">
+    
+                    </div>
+                    <div class="col">
+    
+                        <label>Phone Number</label>
+                        <input type="tel" class="form-control"  name="phone" value="{{user.phone}}"
+                            placeholder="Enter Phone Number">
+                    </div>
+    
+    
+                </div>
+            </div>
+    
+            <div class="form-group my-2 row">
+                <div class="col-md-6">
+                    <label>Upload Image</label>
+                    <input type="file" name="image" >
+    
+                </div>
+                <div class="col-md-6">
+                    <label>Current Image</label>
+                    <img src="{{user.profilePic.url}}" style="width:100px;height:110px">
+                </div>
+    
+    
+            </div>
+    
+            {% if page %}
+            <div class="form-group my-2 row">
+                <div class="col-md-6">
+                    <label>Upload Certificate</label>
+                    <input type="file" name="cert" >
+    
+                </div>
+                <div class="col-md-6">
+                    <label>Current Certificate</label>
+                    <img src="{{user.training_certificate.url}}" style="width:100px;height:110px">
+                </div>
+    
+    
+            </div>
+    
+            <div class="form-group mb-2">
+                <div class="row">
+                    <div class="col">
+                        <label>Select the Service</label>
+                        <select class="form-select" aria-label="Default select example" name="service" 
+                            required>
+                            <option value="{{user.service.service_id}}" selected>{{user.service}}</option>
+                            {% for service in services %}
+    
+                            <option value="{{service.service_id}}">{{service}}</option>
+    
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col">
+                        <label>Experience: (In years)</label>
+                        <input type="number" name="exp" class="form-control" value="{{user.experience}}">
+                    </div>
+                    <div class="col">
+                        <label>Choose your working location: </label>
+                        <select class="form-select" aria-label="Default select example" name="city" >
+                            <option value="{{user.city.id}}">{{user.city}}</option>
+                            {% for i in city %}
+    
+                            <option value="{{i.id}}">{{i}}</option>
+    
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+    
+            </div>
+            {% else %}
+    
+            {% endif %}
+    
+    
+            <button type="submit" class="btn btn-outline-primary">Submit</button>
+            <a href="{% url 'profile' %}" class="btn btn-outline-danger">Cancel</a>
+    
+        </form>
+    
+    </div>
+   
+
 
     <!-- ======= Footer ======= -->
 
@@ -170,6 +250,7 @@
         </div>
     </footer>
 
+
     <!-- End of footer -->
 
 
@@ -194,7 +275,7 @@
     </script>
 
 
-    {% block js %}{% endblock js %}
 </body>
 
 </html>
+

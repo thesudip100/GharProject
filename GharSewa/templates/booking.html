@@ -85,60 +85,26 @@
                 </div>
 
             </div>
-            <div class="form-group my-2">
-                <button type="submit" class="btn btn-outline-primary" id="payment-button">Khalti Pay</button> 
-                {% comment %} <button style="padding: 5px; background-color: rgb(77, 32, 119); font-family: sans-serif; color: white;font-weight: 300;border-radius: 7px;" id="payment-button" onclick = "booked()">Khalti</button> {% endcomment %}
 
-                {% comment %} <a href="{% url 'payment' %}">Pay with khalti</button></a> {% endcomment %}
+            <div class="form-group my-2">
+                <input type="hidden" name="purchase_order_id"  value="{{customer.id}}">
+                <input type="hidden" name="amount"  value="10000">
+                <input type="hidden" name="return_url"  value="http://127.0.0.1:8000/verify/"> 
+            </div>
+            <div class="form-group my-2">
+                <button type="submit"  class="btn btn-outline-primary" >Khalti Pay</button> 
+    
                 <button type="reset" class="btn btn-outline-danger">Reset</button>
                 
-
+    
             </div>
         </form>
+
     </div>
 </div>
 {% endblock %}
 {% block js %}
-<script>
-    var config = {
-        // replace the publicKey with yours
-        "publicKey": "test_public_key_7d87b1034b6f459fa16b6da3705e1e07",
-        "productIdentity": "1234567890",
-        "productName": "GharSewa",
-        "productUrl": "http://gameofthrones.wikia.com/wiki/Dragons",
-        "paymentPreference": [
-            "KHALTI",
-            "EBANKING",
-            "MOBILE_BANKING",
-            "CONNECT_IPS",
-            "SCT",
-            ],
-        "eventHandler": {
-            onSuccess (payload) {
-                // hit merchant api for initiating verfication
-                console.log(payload);
-            },
-            onError (error) {
-                console.log(error);
-            },
-            onClose () {
-                console.log('widget is closing');
-            }
-        }
-    };
 
-    var checkout = new KhaltiCheckout(config);
-    var btn = document.getElementById("payment-button");
-    btn.onclick = function () {
-        // minimum transaction amount must be 10, i.e 1000 in paisa.
-        console.log("Note that this is advance payment only")
-        checkout.show({amount: 25000});
-    }
-</script>
-{% comment %} <script>
-    function booked() {
-        alert('The service has been booked!!!')
-        window.location = ''
-    }
-</script> {% endcomment %}
+
+
 {% endblock %}
