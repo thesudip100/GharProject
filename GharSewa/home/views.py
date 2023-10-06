@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 import requests
 import json
+import random
 
 from home.urls import *
 
@@ -24,6 +25,7 @@ def aboutPage(request):
 
 def customer_register(request):
         user="none"
+        data=request.POST
         if request.method=='POST':
              username=request.POST['customer_username']
              firstName=request.POST['customer_fname']
@@ -35,13 +37,28 @@ def customer_register(request):
              password2=request.POST['customer_pass2']
              profilePic=request.FILES['customer_image']
 
-             if password1==password2:
+             if any(char.isalpha() for char in phone):
+                messages.error(request,"Phone number should not contain letters.")
+            
+             if(len(phone)!=10):
+                messages.error(request,"Phone number must contain 10 digits.")
+            
+             if User.objects.filter(username=username).exists():
+                messages.error(request, 'Username Already Exists.')
+
+             if User.objects.filter(email=email).exists():
+                messages.error(request, 'Email Already Exists.')
+
+             if password1!=password2:
+                messages.error(request, 'Passwords do not match')
+
+             else:
                 user=User.objects.create_user(first_name=firstName,last_name=lastName,password=password1,username=username,email=email)
                 user.save()
                 userRegister.objects.create(firstName=firstName, lastName=lastName, email=email, phone=phone, fullAddress=fullAddress,user_id=user.id,profilePic=profilePic)
-                # customer_group=Group.objects.get(name='Customer')
-                # customer_group.user_set.add(user)  
-                return HttpResponse("Successfully registered customer")
+                messages.success(request,f"Welcome to GharSewa Family, {firstName} {lastName}.Please, login to use our services.")
+                return redirect('login')
+
         
         return render(request,'user_register.html')
 
@@ -53,8 +70,7 @@ def prof_register(request):
      services = Service.objects.all()
      city = City.objects.all()
      if request.method == "POST":
-
-          userName = request.POST['user_username']
+          username = request.POST['user_username']
           firstName = request.POST['user_fname']
           lastName = request.POST['user_lname']
           email = request.POST['user_email']
@@ -62,13 +78,32 @@ def prof_register(request):
           fullAddress = request.POST['user_address']
           password1 = request.POST['user_pass1']
           password2 = request.POST['user_pass2']
+
           profilePic = request.FILES['image']
           experience = request.POST['exp']
           training_certificate = request.FILES['cert']
 
-          
-          if password1==password2:
-               user = User.objects.create_user(first_name=firstName,last_name=lastName,password = password1,username=userName,email=email)
+
+          if any(char.isalpha() for char in phone):
+                messages.error(request,"Phone number should not contain letters.")
+            
+          if(len(phone)!=10):
+                messages.error(request,"Phone number must contain 10 digits.")
+            
+          if User.objects.filter(username=username).exists():
+                messages.error(request, 'Username Already Exists.')
+
+          if User.objects.filter(email=email).exists():
+                messages.error(request, 'Email Already Exists.')
+
+          if int(request.POST['exp'])<0:
+                messages.error(request, 'Experience cant be negative')
+            
+          if password1!=password2:
+                messages.error(request, 'Passwords do not match')
+
+          else:
+               user = User.objects.create_user(first_name=firstName,last_name=lastName,password = password1,username=username,email=email)
                user.save()
 
                service = Service.objects.get(service_id=request.POST['service'])
@@ -77,32 +112,35 @@ def prof_register(request):
               
                profRegister.objects.create(firstName=firstName,lastName=lastName,email=email,fullAddress=fullAddress,phone = phone,profilePic = profilePic,experience = experience,training_certificate=training_certificate,user_id=user.id,service=service, city=city,)
 
-               return HttpResponse("Professional registered successfully")
-     
+               messages.success(request,f"Professional {firstName}, Welcome to GharSewa Family! Please, login to provide services.")
+               return redirect('login')
+      
      context = {'services': services, 'city': city}
      return render(request,'prof_register.html',context)
 
 
-
+#handles login for customers and professionals
 def handleLogin(request):
-     if request.method == 'POST':
-          userName=request.POST.get('username')
-          passWord=request.POST.get('password')
+     if request.method == 'POST': 
+        userName=request.POST.get('username')
+        passWord=request.POST.get('password')
 
-          user=authenticate(request,username=userName,password=passWord)
-          
-          if user is not None:
-                request.session['username']=user.username
-                request.session['user_id']=user.id
-                login(request, user)
-                return redirect(index)
+        user=authenticate(request,username=userName,password=passWord)
+        
+        if user is not None:
+            request.session['username']=user.username
+            request.session['user_id']=user.id
+            login(request, user)
+            return redirect(index)
           
      return render(request, 'login.html')
 
+#handles admin login
 def admin_login(request):
-#     if request.user.is_authenticated:
-#         messages.info(request, 'You are already logged in!!')
-#         return redirect('index')
+    if request.user.is_authenticated:
+        messages.info(request, 'You are already logged in!!')
+        return redirect('index')
+    
 
     if request.method == 'POST':
         username = request.POST.get('logusername')
@@ -115,20 +153,18 @@ def admin_login(request):
 
     return render(request, 'admin_login.html')
 
+#handles logout
 def handleLogout(request):
     logout(request)
     return redirect('/.')
 
+#profile edit feature
 @login_required(login_url='login')
 def edit_profile(request):
     u = User.objects.get(id=request.user.id)
-    
-
     try:
         page = True
         user = profRegister.objects.get(user=u)
-  
-        
 
     except:
         page = False
@@ -144,7 +180,7 @@ def edit_profile(request):
         try:
             image = request.FILES['image']
             user.profilePic = image
-            user.save()
+
         except:
             pass
 
@@ -156,7 +192,7 @@ def edit_profile(request):
             user.city = ct
             certificate = request.FILES['cert']
             user.training_certificate = certificate
-            user.save() 
+
             
         except:
             pass
@@ -180,6 +216,7 @@ def edit_profile(request):
     return render(request,'editprofile.html',context)
 
 
+#profile view
 @login_required(login_url='login')
 def profile(request):
     users = User.objects.get(id=request.user.id)
@@ -205,15 +242,13 @@ def customerBooking(request, pid):
     try:
         client = userRegister.objects.get(user=request.user)  
     except:
-        messages.error(request, 'You must be customer to book a service!!')
+        messages.warning(request, 'You must be customer to book a service!!')
         return redirect('services')
 
     prof = profRegister.objects.get(user=pid)
     
- 
 
-    # book=Booking.objects.get(customer=client)
-
+    #Khalti Payment Gateway
     if request.method == 'POST':
         url = "https://a.khalti.com/api/v2/epayment/initiate/"
 
@@ -251,10 +286,6 @@ def customerBooking(request, pid):
         
         return redirect(new_response['payment_url'])
     
-        
-
-        
-
     return render(request, 'booking.html', {'prof': prof, 'customer': client})
             
 
@@ -286,7 +317,7 @@ def verify(request):
     return redirect('/.')
     
 
-
+#Customer contacts admin
 def contact(request):
     if request.method == 'POST':
 
@@ -299,20 +330,21 @@ def contact(request):
             mycontact = Contact(name=name, email=email,
                                 phone=phone, content=content)
             mycontact.save()
-            messages.success(
-                request, 'Thank You For submitting form. We will reach you ASAP!!')
+            messages.success(request, 'Thank You For submitting form. We will reach you ASAP!!')
 
         else:
-            messages.error(request, 'Please Fill Up the Form Correctly!!')
+            messages.warning(request, 'Please Fill Up the Form Correctly!!')
 
     return render(request, 'contact.html')
 
 
+#Serices page rendering
 def services(request):
     services = Service.objects.all()
     return render(request, 'services.html', {'services': services})
 
 
+#Service Viewing
 def serviceView(request, myid):
     service = Service.objects.filter(service_id=myid)[0]
     professionals = profRegister.objects.filter(service=service) 
@@ -322,7 +354,7 @@ def serviceView(request, myid):
     return render(request, 'service_view.html', context)
 
 
-
+#Booking Details
 @login_required(login_url='login')
 def booking_detail(request):
     page = True
@@ -336,6 +368,7 @@ def booking_detail(request):
     context = {'books': books, 'page': page}
     return render(request, 'bookingdetails.html', context)
 
+#professional booking
 @login_required(login_url='login')
 def profBooking(request):
     page = False
@@ -347,8 +380,17 @@ def profBooking(request):
     context = {'books': books, 'page': page}
     return render(request, 'bookingdetails.html', context)
 
+#cancel booking
 @login_required(login_url='login')
 def cancelBooking(request,cancel_id):
     ser = Booking.objects.get(id=cancel_id)
     ser.delete()
+    prof_email=ser.professional.email
+    subject = 'Booking Cancellation from GharSewa'
+    message = f"Your booking is Cancelled by {request.user.first_name} "
+    from_email = 'agharsewa@gmail.com'
+    recipient_list = [prof_email]
+
+    send_mail(subject, message, from_email, recipient_list)
     return redirect('bookingdetails')
+
